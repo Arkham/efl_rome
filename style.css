@@ -1,0 +1,68 @@
+body {
+  font-family: 'Open Sans';
+}
+
+h1, h2, h3 {
+  font-family: 'Gentium Book Basic';
+  font-weight: normal;
+}
+
+.remark-slide-content {
+  background-size: contain;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.footnote {
+  bottom: 12px;
+  opacity: 0.5;
+  position: absolute;
+  left: 20px;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.striked {
+  text-decoration: line-through;
+}
+
+.red {
+  color: rgb(249, 38, 114);
+}
+
+.inverse {
+  background: #272822;
+  color: #777872;
+  text-shadow: 0 0 20px #333;
+}
+.inverse h1,
+.inverse h2,
+.inverse h3 {
+  color: #f3f3f3;
+}
+.inverse .footnote,
+.inverse .remark-slide-number {
+  opacity: 1;
+}
+
+.quote {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-style: italic;
+  margin: 0.25em 0;
+  padding: 0.25em 40px;
+  line-height: 1.45;
+  position: relative;
+  color: #383838;
+}
+.quote:before {
+  display: block;
+  content: "\201C";
+  font-size: 80px;
+  position: absolute;
+  left: -20px;
+  top: -20px;
+  color: #7a7a7a;
+}
