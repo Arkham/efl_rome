@@ -2,6 +2,10 @@ body {
   font-family: 'Open Sans';
 }
 
+p {
+  margin: 0;
+}
+
 h1, h2, h3 {
   font-family: 'Gentium Book Basic';
   font-weight: normal;
@@ -24,22 +28,31 @@ h1, h2, h3 {
   font-weight: bold;
 }
 
+.italic {
+  font-style: italic;
+}
+
 .striked {
   text-decoration: line-through;
 }
 
+.spaced {
+  margin-bottom: 1em;
+}
+
 .red {
-  color: rgb(249, 38, 114);
+  color: rgb(250, 38, 114);
 }
 
 .inverse {
-  background: #272822;
+  background-color: #272822;
   color: #777872;
   text-shadow: 0 0 20px #333;
 }
 .inverse h1,
 .inverse h2,
-.inverse h3 {
+.inverse h3,
+.inverse > p {
   color: #f3f3f3;
 }
 .inverse .footnote,
@@ -49,11 +62,11 @@ h1, h2, h3 {
 
 .quote {
   font-family: Georgia, serif;
-  font-size: 18px;
+  font-size: 24px;
   font-style: italic;
   margin: 0.25em 0;
   padding: 0.25em 40px;
-  line-height: 1.45;
+  line-height: 1.30;
   position: relative;
   color: #383838;
 }
