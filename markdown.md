@@ -222,7 +222,117 @@ class: inverse
 background-image: url(images/cats.jpg)
 background-size: cover
 
-# Show us the codez!
+# Show us the codez
+
+---
+
+```elixir
+defmodule WideWeb.Map do
+  defstruct data: %{}
+
+  def new, do: %__MODULE__{}
+  def new(data), do: %__MODULE__{data: data}
+
+  def update(%__MODULE__{data: data} = map, node, links) do
+    %{map | data: Map.put(data, node, links)}
+  end
+
+  def reachable(%__MODULE__{data: data}, node) do
+    Map.get(data, node, [])
+  end
+
+  def all_nodes(%__MODULE__{data: data}) do
+    # get list of all nodes
+  end
+end
+```
+
+---
+
+```elixir
+iex(1)> alias WideWeb.Map
+WideWeb.Map
+
+iex(2)> map = Map.new
+%WideWeb.Map{data: %{}}
+
+iex(3)> map = Map.update(map, :berlin, [:london, :paris])
+%WideWeb.Map{data: %{berlin: [:london, :paris]}}
+
+iex(4)> Map.reachable(map, :london)
+[]
+
+iex(5)> Map.reachable(map, :berlin)
+[:london, :paris]
+
+iex(6)> Map.all_nodes(map)
+[:berlin, :london, :paris]
+```
+
+---
+
+```elixir
+defmodule WideWeb.Dijkstra do
+  def route(routing_table, node) do
+    case Map.fetch(routing_table, node) do
+      {:ok, gateway} -> {:ok, gateway}
+      :error         -> :not_found
+    end
+  end
+
+  def table(gateways, map) do
+    sorted_list = map
+                  |> WideWeb.Map.all_nodes
+                  |> Enum.map(fn(node) ->
+                    case node in gateways do
+                      true  -> {node, 0, node}
+                      false -> {node, :infinity, :unknown}
+                    end
+                  end)
+                  |> List.keysort(1)
+
+    iterate(%{}, sorted_list, map)
+  end
+end
+```
+
+---
+
+```elixir
+defmodule WideWeb.Dijkstra do
+  def iterate(routing_table, [], _map) do
+    routing_table
+  end
+  def iterate(routing_table, [{_, :infinity, _}|_rest], _map) do
+    routing_table
+  end
+  def iterate(routing_table, [{dest, hops_count, gw}|list], map) do
+    new_list = map
+               |> WideWeb.Map.reachable(dest)
+               |> Enum.reduce(list, fn(node, acc) ->
+                 update(acc, node, hops_count+1, gw)
+               end)
+
+    iterate(Map.put(routing_table, dest, gw), new_list, map)
+  end
+end
+```
+
+---
+
+```elixir
+iex(1)> alias WideWeb.{Dijkstra, Map}
+[WideWeb.Dijkstra, WideWeb.Map]
+
+iex(2)> gateways = [:madrid, :paris]
+[:madrid, :paris]
+
+iex(3)> map = Map.new(%{madrid: [:berlin], paris: [:rome, :madrid]})
+%WideWeb.Map{data: %{madrid: [:berlin], paris: [:rome, :madrid]}}
+
+iex(4)> Dijkstra.table(gateways, map)
+%{berlin: :madrid, madrid: :madrid, paris: :paris, rome: :paris}
+```
 
 ---
 
