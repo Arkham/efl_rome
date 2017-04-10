@@ -226,6 +226,12 @@ background-size: cover
 
 ---
 
+class: inverse
+
+# Map
+
+---
+
 ```elixir
 defmodule WideWeb.Map do
   defstruct data: %{}
@@ -271,6 +277,12 @@ iex(6)> Map.all_nodes(map)
 
 ---
 
+class: inverse
+
+# Dijkstra implementation
+
+---
+
 ```elixir
 defmodule WideWeb.Dijkstra do
   def route(routing_table, node) do
@@ -279,7 +291,13 @@ defmodule WideWeb.Dijkstra do
       :error         -> :not_found
     end
   end
+end
+```
 
+---
+
+```elixir
+defmodule WideWeb.Dijkstra do
   def table(gateways, map) do
     sorted_list = map
                   |> WideWeb.Map.all_nodes
@@ -333,6 +351,155 @@ iex(3)> map = Map.new(%{madrid: [:berlin], paris: [:rome, :madrid]})
 iex(4)> Dijkstra.table(gateways, map)
 %{berlin: :madrid, madrid: :madrid, paris: :paris, rome: :paris}
 ```
+
+---
+
+class: inverse
+
+# Interface Set
+
+---
+
+```elixir
+defmodule WideWeb.InterfaceSet do
+  def new
+
+  def add(%__MODULE__{data: data} = set, name, ref, pid)
+
+  def remove(%__MODULE__{data: data} = set, name)
+
+  def lookup(%__MODULE__{data: data}, name)
+
+  def ref(%__MODULE__{data: data}, name)
+
+  def name(%__MODULE__{data: data}, ref)
+
+  def list(%__MODULE__{data: data})
+
+  def broadcast(%__MODULE__{data: data}, message)
+end
+```
+
+---
+
+class: inverse
+
+# Link-state History
+
+---
+
+```elixir
+defmodule WideWeb.History do
+  defstruct root: nil, data: %{}
+
+  def new(root) do
+    %__MODULE__{root: root}
+  end
+
+  def check(%__MODULE__{root: root}, root, _count), do: :old
+  def check(%__MODULE__{data: data} = history, node, count) do
+    current_count = Map.get(data, node, 0)
+
+    if count > current_count do
+      {:new, %{history | data: Map.put(data, node, count)}}
+    else
+      :old
+    end
+  end
+end
+```
+
+---
+
+class: inverse
+
+# Router
+
+---
+
+class: left
+
+# What does a router have
+
+* a name, like :london
+* a link-state version counter
+* a history of received link-state messages
+* a set of interfaces
+* a routing table
+* a map of the network
+
+---
+
+```elixir
+defmodule WideWeb.Router do
+  @broadcast_interval 3_000
+
+  defmodule State do
+    defstruct name: nil, n: nil, history: nil, interfaces: nil,
+      table: nil, map: nil
+  end
+
+  def init(name) do
+    interfaces = InterfaceSet.new()
+    map = Map.new()
+    table = Dijkstra.table([name], map)
+    history = History.new(name)
+
+    Process.send_after(self(), :broadcast, @broadcast_interval)
+
+    router(%State{name: name, n: 0, history: history,
+                  interfaces: interfaces, table: table, map: map})
+  end
+end
+```
+
+---
+
+class: left
+
+# What does the router do
+
+* determine which nodes he's connected to
+* announce his direct neighbours in a link-state message
+* forward all new link-state messages to his neighbours
+* route messages
+
+---
+
+```elixir
+  def router(%State{name: name, n: n, history: history,
+                    interfaces: interfaces, table: table,
+                    map: map} = state) do
+    receive do
+      # Interface management
+      {:add, node, pid} ->
+
+      {:remove, node} ->
+
+      {:DOWN, ref, :process, _, _} ->
+
+      # Incoming link-state messages
+      {:links, node, version, links} ->
+
+      # Update routing table
+      :update ->
+
+      # Broadcast new version of link-state message
+      :broadcast ->
+
+      # Route a message
+      {:route, to, from, message, ttl} ->
+    end
+  end
+```
+
+---
+
+class: inverse
+background-image: url(images/cats.jpg)
+background-size: cover
+
+# DEMO DEMO DEMO
 
 ---
 
